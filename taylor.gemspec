@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = Taylor::VERSION
   gem.authors       = ["Jonas Nicklas"]
   gem.email         = ["jonas.nicklas@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{Generate valid models without any additional setup}
+  gem.summary       = %q{Yet another factory replacement gem}
+  gem.homepage      = "http://github.com/jnicklas/taylor"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
