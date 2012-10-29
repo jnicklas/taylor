@@ -12,6 +12,7 @@ Add this to your Gemfile:
 group :test do
   gem "taylor"
 end
+```
 
 # Introduction
 
@@ -134,9 +135,8 @@ end
 Optionally you can also extend the class under test or its superclass with
 the Taylor::Model module, for a convenient shortcut:
 
-```
+``` ruby
 ActiveRecord::Base.extend Taylor::Model
-
 
 describe Product do
   it "requires a name" do
