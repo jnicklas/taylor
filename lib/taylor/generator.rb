@@ -4,6 +4,7 @@ module Taylor
   VALIDATORS = {
     :presence => ActiveModel::Validations::PresenceValidator,
     :acceptance => ActiveModel::Validations::AcceptanceValidator,
+    :format => ActiveModel::Validations::FormatValidator,
   }
 
   class Column
@@ -36,7 +37,9 @@ module Taylor
     end
 
     def string
-      if validator(:presence)
+      if validator(:format) and validator(:format).options[:with]
+        Taylor::Randomizer.regexp(validator(:format).options[:with])
+      elsif validator(:presence)
         Taylor::Randomizer.string(4, 10)
       end
     end
