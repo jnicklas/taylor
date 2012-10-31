@@ -94,14 +94,11 @@ module Taylor
     end
 
     def generate
-      record = klass.new
-      columns.each do |column|
-        writer_name = :"#{column.name}="
-        if record.respond_to?(writer_name)
-          record.send(writer_name, column.generate)
-        end
+      pairs = columns.map do |column|
+        value = column.generate
+        [column.name, value] if value
       end
-      record
+      klass.new(Hash[pairs])
     end
 
     def columns
