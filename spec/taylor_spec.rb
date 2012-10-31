@@ -3,45 +3,21 @@ require "spec_helper"
 describe Taylor do
   let(:time) { Time.now }
 
-  def generate_class(&block)
-    Class.new(ActiveRecord::Base) do
-      self.table_name = "products"
-      instance_eval(&block) if block
-      Object.const_set("Product", self)
-    end
-  end
-
-  before(:all) do
-    ActiveRecord::Base.connection.create_table :products do |t|
-      t.string :name
-      t.integer :price
-      t.datetime :published_at
-    end
-  end
-
-  after { Object.send(:remove_const, "Product") if defined?(Product) }
-
   context "with no validations" do
-    it "generates an empty object" do
-      klass = generate_class
-      record = Taylor.generate(klass)
-      record.class.should == klass
-      record.attributes.values.compact.should be_empty
-    end
+    it_is_valid_with { }
   end
 
-  context "with presence validations" do
-    it "fills in any required fields with a sensible value" do
-      Taylor.stub(:random).with(:string, "name").and_return("John")
-      Taylor.stub(:random).with(:integer, "price").and_return(3)
-      Taylor.stub(:random).with(:datetime, "published_at").and_return(time)
-
-      klass = generate_class { validates_presence_of *(column_names - ["id"]) }
-      record = Taylor.generate(klass)
-      record.class.should == klass
-      record.name.should == "John"
-      record.price.should == 3
-      record.published_at.should == time
-    end
+  context "with validates_presence_of" do
+    it_is_valid_with("string column")    { validates_presence_of :name }
+    it_is_valid_with("text column")      { validates_presence_of :description }
+    it_is_valid_with("integer column")   { validates_presence_of :amount }
+    it_is_valid_with("float column")     { validates_presence_of :rating }
+    it_is_valid_with("decimal column")   { validates_presence_of :price }
+    it_is_valid_with("datetime column")  { validates_presence_of :published_at }
+    it_is_valid_with("timestamp column") { validates_presence_of :invented_at }
+    it_is_valid_with("date column")      { validates_presence_of :released_on }
+    it_is_valid_with("time column")      { validates_presence_of :feed_after }
+    it_is_valid_with("virtual column")   { validates_presence_of :virtual }
+    it_is_valid_with("multiple columns") { validates_presence_of :name, :description, :price, :published_at }
   end
 end

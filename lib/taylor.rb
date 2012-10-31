@@ -1,5 +1,6 @@
 require "taylor/version"
 require "taylor/generator"
+require "taylor/randomizer"
 
 module Taylor
   extend self

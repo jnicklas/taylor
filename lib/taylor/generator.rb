@@ -1,4 +1,79 @@
+require "active_model"
+
 module Taylor
+  VALIDATORS = {
+    :presence => ActiveModel::Validations::PresenceValidator,
+  }
+
+  class Column
+    attr_reader :klass, :name, :column
+
+    def initialize(klass, name, column)
+      @klass = klass
+      @name = name
+      @column = column
+    end
+
+    def type
+      if column
+        column.type
+      else
+        :virtual
+      end
+    end
+
+    def generate
+      send(type) if respond_to?(type)
+    end
+
+    def virtual
+      string
+    end
+
+    def string
+      if validator(:presence)
+        Taylor::Randomizer.string(4, 10)
+      end
+    end
+    alias_method :text, :string
+
+    def integer
+      rand(10000)
+    end
+
+    def float
+      rand
+    end
+
+    def decimal
+      BigDecimal.new(rand(10000)) / 100
+    end
+
+    def datetime
+      Time.now
+    end
+    alias_method :timestamp, :datetime
+    alias_method :time, :datetime
+
+    def date
+      Date.today
+    end
+
+    def boolean
+      [true, false].sample
+    end
+
+  private
+
+    def validator(name)
+      validators.find { |v| v.is_a?(VALIDATORS[name]) }
+    end
+
+    def validators
+      klass.validators_on(name)
+    end
+  end
+
   class Generator
     attr_reader :klass
 
@@ -8,22 +83,23 @@ module Taylor
 
     def generate
       record = klass.new
-      if defined?(ActiveRecord::Base) and klass.ancestors.include?(ActiveRecord::Base)
-        klass.columns.each do |column|
-          writer_name = :"#{column.name}="
-          if validation(:presence, column.name) and record.respond_to?(writer_name)
-            record.send(writer_name, Taylor.random(column.type, column.name))
-          end
+      columns.each do |column|
+        writer_name = :"#{column.name}="
+        if record.respond_to?(writer_name)
+          record.send(writer_name, column.generate)
         end
       end
       record
     end
 
-    def validation(type, column)
-      validator = case type
-        when :presence then ActiveModel::Validations::PresenceValidator
+    def columns
+      names = klass.validators.map do |validator|
+        validator.attributes
+      end.flatten.uniq
+      names.map do |name|
+        column = klass.columns_hash[name.to_s]
+        Column.new(klass, name, column)
       end
-      klass.validators_on(column).find { |v| v.is_a? validator }
     end
   end
 end
