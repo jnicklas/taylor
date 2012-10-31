@@ -20,4 +20,10 @@ describe Taylor do
     it_is_valid_with("virtual column")   { validates_presence_of :virtual }
     it_is_valid_with("multiple columns") { validates_presence_of :name, :description, :price, :published_at }
   end
+
+  context "with validates_acceptance_of" do
+    it_is_valid_with("boolean column")   { validates_acceptance_of :terms_accepted, :accept => true, :allow_nil => false }
+    it_is_valid_with("virtual column")   { validates_acceptance_of :virtual, :allow_nil => false }
+    it_is_valid_with("with allow nil")   { validates_acceptance_of :virtual }
+  end
 end

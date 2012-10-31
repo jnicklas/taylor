@@ -19,13 +19,11 @@ end
 
 module TaylorSpecHelper
   module IsValidWith
-    def it_is_valid_with(description="", &block)
-      it "generates valid data with #{description}" do
+    def it_is_valid_with(description="", *args, &block)
+      it "generates valid data with #{description}", *args do
         klass = generate_class(&block)
         20.times do
-          model = Taylor.generate(klass)
-          model.valid?
-          model.errors.should be_empty
+          Taylor.generate(klass).should be_valid
         end
         record = Taylor.generate(klass)
         record.save!
@@ -35,12 +33,23 @@ module TaylorSpecHelper
   end
 
   module Generate
+    extend RSpec::Matchers::DSL
+
     def generate_class(&block)
       Class.new(ActiveRecord::Base) do
         attr_accessor :virtual
         self.table_name = "products"
         instance_eval(&block) if block
         Object.const_set("TaylorSpecProduct", self)
+      end
+    end
+
+    matcher :be_valid do
+      match do |record|
+        record.valid?
+      end
+      failure_message_for_should do |record|
+        "#{record.inspect} should be valid, but had errors: #{record.errors.full_messages.join(", ")}"
       end
     end
   end

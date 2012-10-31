@@ -3,6 +3,7 @@ require "active_model"
 module Taylor
   VALIDATORS = {
     :presence => ActiveModel::Validations::PresenceValidator,
+    :acceptance => ActiveModel::Validations::AcceptanceValidator,
   }
 
   class Column
@@ -27,7 +28,11 @@ module Taylor
     end
 
     def virtual
-      string
+      if validator(:acceptance) and not validator(:acceptance).options[:allow_nil]
+        validator(:acceptance).options[:accept]
+      else
+        string
+      end
     end
 
     def string
@@ -60,7 +65,11 @@ module Taylor
     end
 
     def boolean
-      [true, false].sample
+      if validator(:acceptance) and not validator(:acceptance).options[:allow_nil]
+        validator(:acceptance).options[:accept]
+      else
+        [true, false].sample
+      end
     end
 
   private
