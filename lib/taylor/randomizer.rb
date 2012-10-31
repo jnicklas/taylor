@@ -5,7 +5,8 @@ module Taylor
     CHARS = ("a".."z").to_a
 
     def string(min, max)
-      8.times.map { CHARS.sample }.join
+      number = rand(max - min + 1) + min
+      number.times.map { CHARS.sample }.join
     end
 
     def regexp(exp)

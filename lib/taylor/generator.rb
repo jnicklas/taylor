@@ -5,6 +5,9 @@ module Taylor
     :presence => ActiveModel::Validations::PresenceValidator,
     :acceptance => ActiveModel::Validations::AcceptanceValidator,
     :format => ActiveModel::Validations::FormatValidator,
+    :inclusion_of => ActiveModel::Validations::InclusionValidator,
+    :length => ActiveModel::Validations::LengthValidator,
+    :numericality => ActiveModel::Validations::NumericalityValidator,
   }
 
   class Column
@@ -29,16 +32,33 @@ module Taylor
     end
 
     def virtual
-      if validator(:acceptance) and not validator(:acceptance).options[:allow_nil]
-        validator(:acceptance).options[:accept]
-      else
+      validation_names = validators.map { |v| VALIDATORS.invert[v.class] }
+      if not (validation_names & [:inclusion_of, :format, :length]).empty?
+        string
+      elsif validation_names.include?(:numericality)
+        integer
+      elsif validation_names.include?(:acceptance)
+        boolean
+      elsif validation_names.include?(:presence)
         string
       end
     end
 
     def string
-      if validator(:format) and validator(:format).options[:with]
+      if validator(:inclusion_of)
+        options = validator(:inclusion_of).options[:in] || validator(:inclusion_of).options[:within]
+        options.sample
+      elsif validator(:format) and validator(:format).options[:with]
         Taylor::Randomizer.regexp(validator(:format).options[:with])
+      elsif validator(:length)
+        options = validator(:length).options
+        if options[:is]
+          Taylor::Randomizer.string(options[:is], options[:is])
+        elsif options[:minimum]
+          Taylor::Randomizer.string(options[:minimum], options[:maximum] || (options[:minimum]+8))
+        elsif options[:maximum]
+          Taylor::Randomizer.string(1, options[:maximum])
+        end
       elsif validator(:presence)
         Taylor::Randomizer.string(4, 10)
       end
@@ -46,32 +66,45 @@ module Taylor
     alias_method :text, :string
 
     def integer
-      rand(10000)
+      if validator(:numericality)
+        options = validator(:numericality).options
+        if options[:less_than]
+          rand(options[:less_than])
+        end
+      elsif validator(:presence)
+        rand(100000)
+      end
     end
 
     def float
-      rand
+      if validator(:numericality)
+        options = validator(:numericality).options
+        if options[:less_than]
+          rand * options[:less_than]
+        end
+      elsif validator(:presence)
+        rand * 100000
+      end
     end
 
     def decimal
-      BigDecimal.new(rand(10000)) / 100
+      value = float
+      BigDecimal.new(value.to_s) if value
     end
 
     def datetime
-      Time.now
+      Time.now if validator(:presence)
     end
     alias_method :timestamp, :datetime
     alias_method :time, :datetime
 
     def date
-      Date.today
+      Date.today if validator(:presence)
     end
 
     def boolean
       if validator(:acceptance) and not validator(:acceptance).options[:allow_nil]
         validator(:acceptance).options[:accept]
-      else
-        [true, false].sample
       end
     end
 
