@@ -126,5 +126,19 @@ describe Taylor do
       it_is_valid_with("decimal")  { validates_numericality_of :price,   :less_than_or_equal => 8 }
       it_is_valid_with("virtual")  { validates_numericality_of :virtual, :less_than_or_equal => 8 }
     end
+
+    context "with greater than option" do
+      it_is_valid_with("integer")  { validates_numericality_of :amount,  :greater_than => 1_000_000 }
+      it_is_valid_with("float")    { validates_numericality_of :rating,  :greater_than => 1_000_000 }
+      it_is_valid_with("decimal")  { validates_numericality_of :price,   :greater_than => 1_000_000 }
+      it_is_valid_with("virtual")  { validates_numericality_of :virtual, :greater_than => 1_000_000 }
+    end
+
+    context "with greater than or equal option" do
+      it_is_valid_with("integer")  { validates_numericality_of :amount,  :greater_than_or_equal => 1_000_000 }
+      it_is_valid_with("float")    { validates_numericality_of :rating,  :greater_than_or_equal => 1_000_000 }
+      it_is_valid_with("decimal")  { validates_numericality_of :price,   :greater_than_or_equal => 1_000_000 }
+      it_is_valid_with("virtual")  { validates_numericality_of :virtual, :greater_than_or_equal => 1_000_000 }
+    end
   end
 end

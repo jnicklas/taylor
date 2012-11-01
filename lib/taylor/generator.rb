@@ -72,6 +72,10 @@ module Taylor
           rand(options[:less_than])
         elsif options[:less_than_or_equal]
           rand(options[:less_than_or_equal] + 1)
+        elsif options[:greater_than]
+          rand(100000) + options[:greater_than]
+        elsif options[:greater_than_or_equal]
+          rand(100000) + options[:greater_than_or_equal] + 1
         end
       elsif validator(:presence)
         rand(100000)
@@ -85,6 +89,10 @@ module Taylor
           rand * options[:less_than]
         elsif options[:less_than_or_equal]
           rand * options[:less_than_or_equal]
+        elsif options[:greater_than]
+          (rand * 100000) + options[:greater_than]
+        elsif options[:greater_than_or_equal]
+          (rand * 100000) + options[:greater_than_or_equal]
         end
       elsif validator(:presence)
         rand * 100000
