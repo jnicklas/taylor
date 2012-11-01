@@ -119,5 +119,12 @@ describe Taylor do
       it_is_valid_with("decimal")  { validates_numericality_of :price,   :less_than => 8 }
       it_is_valid_with("virtual")  { validates_numericality_of :virtual, :less_than => 8 }
     end
+
+    context "with less than or equal option" do
+      it_is_valid_with("integer")  { validates_numericality_of :amount,  :less_than_or_equal => 8 }
+      it_is_valid_with("float")    { validates_numericality_of :rating,  :less_than_or_equal => 8 }
+      it_is_valid_with("decimal")  { validates_numericality_of :price,   :less_than_or_equal => 8 }
+      it_is_valid_with("virtual")  { validates_numericality_of :virtual, :less_than_or_equal => 8 }
+    end
   end
 end

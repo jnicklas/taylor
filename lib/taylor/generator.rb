@@ -70,6 +70,8 @@ module Taylor
         options = validator(:numericality).options
         if options[:less_than]
           rand(options[:less_than])
+        elsif options[:less_than_or_equal]
+          rand(options[:less_than_or_equal] + 1)
         end
       elsif validator(:presence)
         rand(100000)
@@ -81,6 +83,8 @@ module Taylor
         options = validator(:numericality).options
         if options[:less_than]
           rand * options[:less_than]
+        elsif options[:less_than_or_equal]
+          rand * options[:less_than_or_equal]
         end
       elsif validator(:presence)
         rand * 100000
