@@ -1,5 +1,6 @@
 require "taylor/version"
 require "taylor/generator"
+require "taylor/column"
 require "taylor/randomizer"
 
 module Taylor
