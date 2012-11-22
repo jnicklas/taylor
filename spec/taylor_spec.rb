@@ -3,10 +3,15 @@ require "spec_helper"
 describe Taylor do
   let(:time) { Time.now }
 
+  it "persists objects when called with an exclamation mark" do
+    klass = generate_class { validates_presence_of :name }
+    Taylor.generate!(klass).should be_persisted
+  end
+
   context "with no validations" do
     it_is_valid_with { }
     it "generates blank objects" do
-      generate_class.new.attributes.values.compact.should == []
+      Taylor.generate(generate_class).attributes.values.compact.should == []
     end
   end
 

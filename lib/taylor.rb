@@ -9,4 +9,8 @@ module Taylor
   def generate(klass)
     Taylor::Generator.new(klass).generate
   end
+
+  def generate!(klass)
+    generate(klass).tap(&:save!)
+  end
 end
