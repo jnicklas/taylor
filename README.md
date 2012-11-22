@@ -23,7 +23,7 @@ class Product < ActiveRecord::Base
   validates_presence_of :name, :price, :category
   validates_inclusion_of :category, :in => %w[suv roadster van]
   validates_length_of :name, :minimum => 4
-  validates_numbericality_of :price, :greater_than_or_equal_to => 0
+  validates_numericality_of :price, :greater_than_or_equal_to => 0
 end
 ```
 
@@ -80,9 +80,8 @@ Taylor.mass_assignment = false
 
 # Manual specification
 
-Sometimes Taylor doesn't get it quite right. For example, Taylor cannot
-understand what to with `validates_format_of`. If you want to set additional
-attributes, you can specify them like this:
+Sometimes Taylor doesn't get it quite right. In this case you can manipulate
+the attributes that will be set by calling the `specify` method:
 
 ``` ruby
 Taylor.specify(Product) do |attributes|
@@ -148,3 +147,7 @@ end
 You are free to choose which syntax you prefer. The latter is maybe more
 readable, whereas the former can help you generate a wider variety of models
 without additional setup.
+
+# License
+
+MIT, see separate LICENSE.txt file.
