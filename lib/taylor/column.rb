@@ -1,15 +1,4 @@
-require "active_model"
-
 module Taylor
-  VALIDATORS = {
-    :presence =>     ActiveModel::Validations::PresenceValidator,
-    :acceptance =>   ActiveModel::Validations::AcceptanceValidator,
-    :format =>       ActiveModel::Validations::FormatValidator,
-    :inclusion_of => ActiveModel::Validations::InclusionValidator,
-    :length =>       ActiveModel::Validations::LengthValidator,
-    :numericality => ActiveModel::Validations::NumericalityValidator,
-  }
-
   class Column
     attr_reader :klass, :name, :column
 
@@ -38,7 +27,7 @@ module Taylor
     end
 
     def virtual
-      validation_names = validators.map { |v| VALIDATORS.invert[v.class] }
+      validation_names = validators.map { |v| validator_types.invert[v.class] }
       if not (validation_names & [:inclusion_of, :format, :length]).empty?
         string
       elsif validation_names.include?(:numericality)
@@ -82,6 +71,8 @@ module Taylor
           rand(100000) + options[:greater_than]
         elsif options[:greater_than_or_equal]
           rand(100000) + options[:greater_than_or_equal] + 1
+        else
+          rand(100000)
         end
       elsif validator(:presence)
         rand(100000)
@@ -128,12 +119,25 @@ module Taylor
 
   private
 
+    def validator_types
+      {
+        :presence =>     ActiveModel::Validations::PresenceValidator,
+        :acceptance =>   ActiveModel::Validations::AcceptanceValidator,
+        :format =>       ActiveModel::Validations::FormatValidator,
+        :inclusion_of => ActiveModel::Validations::InclusionValidator,
+        :length =>       ActiveModel::Validations::LengthValidator,
+        :numericality => ActiveModel::Validations::NumericalityValidator,
+      }
+    end
+
     def association_reflection
-      klass.reflect_on_association(name)
+      if klass.respond_to?(:reflect_on_association)
+        klass.reflect_on_association(name)
+      end
     end
 
     def validator(name)
-      validators.find { |v| v.is_a?(VALIDATORS[name]) }
+      validators.find { |v| v.is_a?(validator_types[name]) }
     end
 
     def validators

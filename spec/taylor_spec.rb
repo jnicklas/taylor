@@ -28,6 +28,36 @@ describe Taylor do
     record.category.should_not be_persisted
   end
 
+  it "does nothing when class does not have validations" do
+    klass = Class.new do
+      attr_reader :attributes
+      def initialize(attributes={})
+        @attributes = attributes
+      end
+    end
+    Taylor.generate(klass).attributes.values.compact.should == []
+    Taylor.generate(klass, :name => "Jonas").attributes[:name].should == "Jonas"
+  end
+
+  it "generates custom classes with AM validations" do
+    klass = Class.new do
+      include ActiveModel::Validations
+      validates_presence_of :name, :amount
+      validates_numericality_of :amount, :less_than => 10
+
+      attr_reader :name, :amount
+      def initialize(attributes={})
+        @name, @amount = attributes.values_at(:name, :amount)
+      end
+    end
+    Object.const_set("TaylorSpecProduct", klass)
+    Taylor.generate(klass).should be_valid
+    record = Taylor.generate(klass, :name => "Jonas")
+    record.should be_valid
+    record.name.should == "Jonas"
+    record.amount.should < 10
+  end
+
   context "with no validations" do
     it_is_valid_with { }
     it "generates blank objects" do

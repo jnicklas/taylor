@@ -18,12 +18,18 @@ module Taylor
     end
 
     def columns
-      names = klass.validators.map do |validator|
-        validator.attributes
-      end.flatten.uniq
-      names.map do |name|
-        column = klass.columns_hash[name.to_s]
-        Column.new(klass, name, column)
+      if klass.respond_to?(:validators)
+        names = klass.validators.map do |validator|
+          validator.attributes
+        end.flatten.uniq
+        names.map do |name|
+          if klass.respond_to?(:columns_hash)
+            column = klass.columns_hash[name.to_s]
+          end
+          Column.new(klass, name, column)
+        end
+      else
+        []
       end
     end
   end
