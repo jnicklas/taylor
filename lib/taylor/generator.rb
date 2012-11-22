@@ -6,12 +6,15 @@ module Taylor
       @klass = klass
     end
 
-    def generate
+    def generate(attributes)
       pairs = columns.map do |column|
-        value = column.generate
-        [column.name, value] if value
+        unless attributes.keys.include?(column.name)
+          value = column.generate
+          [column.name, value] if value
+        end
       end
-      klass.new(Hash[pairs])
+      attributes = Hash[pairs].merge(attributes)
+      klass.new(attributes)
     end
 
     def columns

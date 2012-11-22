@@ -8,6 +8,13 @@ describe Taylor do
     Taylor.generate!(klass).should be_persisted
   end
 
+  it "allows attributes to be overridden" do
+    klass = generate_class { validates_presence_of :name, :description, :amount }
+    record = Taylor.generate(klass, :name => "Jonas")
+    record.should be_valid
+    record.name.should == "Jonas"
+  end
+
   context "with no validations" do
     it_is_valid_with { }
     it "generates blank objects" do

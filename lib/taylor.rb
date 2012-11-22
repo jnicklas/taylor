@@ -6,11 +6,11 @@ require "taylor/randomizer"
 module Taylor
   extend self
 
-  def generate(klass)
-    Taylor::Generator.new(klass).generate
+  def generate(klass, attributes={})
+    Taylor::Generator.new(klass).generate(attributes)
   end
 
-  def generate!(klass)
-    generate(klass).tap(&:save!)
+  def generate!(klass, attributes={})
+    generate(klass, attributes).tap(&:save!)
   end
 end
