@@ -8,6 +8,7 @@ ActiveRecord::Base.connection.create_table :products do |t|
   t.string :name
   t.text :description
   t.integer :amount
+  t.integer :category_id
   t.float :rating
   t.decimal :price, :precision => 6, :scale => 2
   t.datetime :published_at
@@ -15,6 +16,15 @@ ActiveRecord::Base.connection.create_table :products do |t|
   t.date :released_on
   t.time :feed_after
   t.boolean :terms_accepted
+end
+
+ActiveRecord::Base.connection.create_table :categories do |t|
+  t.string :name
+end
+
+class Category < ActiveRecord::Base
+  has_many :products
+  validates_presence_of :name
 end
 
 module TaylorSpecHelper

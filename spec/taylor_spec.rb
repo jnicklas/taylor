@@ -15,6 +15,19 @@ describe Taylor do
     record.name.should == "Jonas"
   end
 
+  it "generates associated records when the association is required" do
+    klass = generate_class do
+      belongs_to :category
+      validates_presence_of :category
+    end
+    record = Taylor.generate(klass)
+    record.should be_valid
+    record.category.should be_an_instance_of(Category)
+    record.category.name.should_not be_blank
+    record.category.should be_valid
+    record.category.should_not be_persisted
+  end
+
   context "with no validations" do
     it_is_valid_with { }
     it "generates blank objects" do

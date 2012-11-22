@@ -20,7 +20,9 @@ module Taylor
     end
 
     def type
-      if column
+      if association_reflection
+        :association
+      elsif column
         column.type
       else
         :virtual
@@ -29,6 +31,10 @@ module Taylor
 
     def generate
       send(type) if respond_to?(type)
+    end
+
+    def association
+      Taylor.generate(association_reflection.klass)
     end
 
     def virtual
@@ -121,6 +127,10 @@ module Taylor
     end
 
   private
+
+    def association_reflection
+      klass.reflect_on_association(name)
+    end
 
     def validator(name)
       validators.find { |v| v.is_a?(VALIDATORS[name]) }
