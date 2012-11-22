@@ -28,6 +28,20 @@ describe Taylor do
     record.category.should_not be_persisted
   end
 
+  it "generates and persists associated records when the association is required" do
+    klass = generate_class do
+      belongs_to :category
+      validates_presence_of :category
+    end
+    record = Taylor.generate!(klass)
+    record.should be_valid
+    record.should be_persisted
+    record.category.should be_an_instance_of(Category)
+    record.category.name.should_not be_blank
+    record.category.should be_valid
+    record.category.should be_persisted
+  end
+
   it "does nothing when class does not have validations" do
     klass = Class.new do
       attr_reader :attributes
