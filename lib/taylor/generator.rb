@@ -14,7 +14,15 @@ module Taylor
         end
       end
       attributes = Hash[pairs].merge(attributes)
-      klass.new(attributes)
+      if Taylor.mass_assign
+        klass.new(attributes)
+      else
+        klass.new.tap do |record|
+          attributes.each do |key, value|
+            record.public_send("#{key}=", value)
+          end
+        end
+      end
     end
 
     def columns

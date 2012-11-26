@@ -81,6 +81,28 @@ describe Taylor do
     record.amount.should < 10
   end
 
+  it "mass assigns by default" do
+    klass = generate_class do
+      self.mass_assignment_sanitizer = :strict
+      attr_accessible :name
+      validates_presence_of :name, :description, :amount
+    end
+    expect { Taylor.generate!(klass) }.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+  end
+
+  context "with mass_assign set to `false`" do
+    after { Taylor.mass_assign = true }
+    it "assigns attributes individually" do
+      Taylor.mass_assign = false
+      klass = generate_class do
+        self.mass_assignment_sanitizer = :strict
+        attr_accessible :name
+        validates_presence_of :name, :description, :amount
+      end
+      Taylor.generate!(klass).should be_persisted
+    end
+  end
+
   context "with no validations" do
     it_is_valid_with { }
     it "generates blank objects" do
