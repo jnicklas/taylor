@@ -3,9 +3,18 @@ require "spec_helper"
 describe Taylor do
   let(:time) { Time.now }
 
-  it "persists objects when called with an exclamation mark" do
+  it "creates new records when called without bang" do
     klass = generate_class { validates_presence_of :name }
-    Taylor.generate!(klass).should be_persisted
+    record = Taylor.generate(klass)
+    record.name.should be_present
+    record.should_not be_persisted
+  end
+
+  it "persists objects when called with a bang" do
+    klass = generate_class { validates_presence_of :name }
+    record = Taylor.generate!(klass)
+    record.name.should be_present
+    record.should be_persisted
   end
 
   it "allows attributes to be overridden" do
