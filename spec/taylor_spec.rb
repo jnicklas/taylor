@@ -24,6 +24,37 @@ describe Taylor do
     record.name.should == "Jonas"
   end
 
+  it "allows a specification to be set" do
+    counter = 0
+    klass = generate_class { validates_presence_of :name, :description, :amount }
+    Taylor.specify(klass) do
+      counter += 1
+      { :description => "Lorem ipsum #{counter}" }
+    end
+    record = Taylor.generate(klass, :name => "Jonas")
+    record.name.should == "Jonas"
+    record.description.should == "Lorem ipsum 1"
+    record.should be_valid
+    Taylor.generate(klass).description.should == "Lorem ipsum 2"
+    Taylor.generate(klass, :description => "foo").description.should == "foo"
+  end
+
+  it "allows a specification to be exclusive" do
+    counter = 0
+    klass = generate_class { validates_presence_of :name, :description, :amount }
+    Taylor.specify!(klass) do
+      counter += 1
+      { :description => "Lorem ipsum #{counter}" }
+    end
+    record = Taylor.generate(klass, :name => "Jonas")
+    record.name.should == "Jonas"
+    record.description.should == "Lorem ipsum 1"
+    record.amount.should be_blank
+    record.should_not be_valid
+    Taylor.generate(klass).description.should == "Lorem ipsum 2"
+    Taylor.generate(klass, :description => "foo").description.should == "foo"
+  end
+
   it "generates associated records when the association is required" do
     klass = generate_class do
       belongs_to :category

@@ -6,14 +6,25 @@ module Taylor
       @klass = klass
     end
 
+    def specification
+      Taylor.specifications[klass]
+    end
+
+    def inference_disabled?
+      Taylor.inference_disabled[klass]
+    end
+
     def generate(attributes)
-      pairs = columns.map do |column|
-        unless attributes.keys.include?(column.name)
-          value = column.generate
-          [column.name, value] if value
+      attributes = specification.call.merge(attributes) if specification
+      unless inference_disabled?
+        pairs = columns.map do |column|
+          unless attributes.keys.include?(column.name)
+            value = column.generate
+            [column.name, value] if value
+          end
         end
+        attributes = Hash[pairs].merge(attributes)
       end
-      attributes = Hash[pairs].merge(attributes)
       if Taylor.mass_assign
         klass.new(attributes)
       else
